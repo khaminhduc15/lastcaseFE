@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" e.g.single post post-1234>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../css/login.css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+</head>
+<body>
+<div class="navbar">
+    <div class="nav_left">
+        <div><a href="">Home</a></div>
+        <div><a href="">Blog</a></div>
+        <div><a href="">Profile</a></div>
+    </div>
+    <div class="nav_right" id="nav_right">
+
+    </div>
+</div>
+<hr>
+<div class="container" id="form_login">
+</div>
+<div class="body" id="body"></div>
+<script>
+    $(document).ready(function () {
+        $(".container").fadeIn(1000);
+        $(".s2class").css({"color": "#EE9BA3"});
+        $(".s1class").css({"color": "#748194"});
+        $(".signin").css({"display": "none"});
+        $(".signup").css({"display": ""});
+    });
+
+    function loadRight(){
+        let usn = localStorage.getItem('username');
+        if(usn != null){
+            let str = `<div class="usn_text">Hi, `+usn+`</div>`
+            document.getElementById('nav_right').innerHTML = str;
+            loadBlog();
+        }
+        else{
+            let str = `<button class="btn_login" onclick="formsignin()">Sign In/Sign Up</button>`
+            document.getElementById('nav_right').innerHTML = str;
+        }
+    }
+    loadRight()
+    function formsignup() {
+        let str = `<div class="c1">
+
+        <div class="c11">
+            <h1 class="mainhead">PICK YOUR SPOT</h1>
+            <p class="mainp">Just click the buttons below to toggle between SignIn & SignUp</p>
+        </div>
+        <div id="left" onclick="formsignin()"><h1 class="s1class"><span>SIGN</span><span class="su">IN</span>
+        </h1></div>
+        <div id="right" onclick="formsignup()"><h1 class="s2class"><span>SIGN</span><span class="su">UP</span></h1>
+        </div>
+        </div>
+        <div class="c2">
+        <div class="signup">
+            <h1 class="signup1">SIGN UP</h1>
+            <br><br><br><br>
+            <input name="username" type="text" placeholder="Username*" id="username"  class="username"/>
+
+            <input name="name" type="text" placeholder="Name*" id="name" class="username"/>
+
+            <input name="password" type="password" placeholder="Password*" id="password" class="username"/>
+
+            <button class="btn" onclick="save()">Sign Up</button>
+        </div>
+        </div>
+        `
+        document.getElementById('form_login').innerHTML = str;
+    }
+
+    function formsignin() {
+        let str = `
+               <div class="c1">
+
+        <div class="c11">
+            <h1 class="mainhead">PICK YOUR SPOT</h1>
+            <p class="mainp">Just click the buttons below to toggle between SignIn & SignUp</p>
+        </div>
+        <div id="left" onclick="formsignin()"><h1 class="s1class"><span>SIGN</span><span class="su">IN</span>
+        </h1></div>
+        <div id="right" onclick="formsignup()"><h1 class="s2class"><span>SIGN</span><span class="su">UP</span></h1>
+        </div>
+        </div>
+        <div class="c2">
+            <div class="signin">
+
+            <h1 class="signup1">SIGN IN</h1>
+            <br><br><br><br>
+            <input name="username" type="text" placeholder="Username*" class="username" id="usn"/>
+
+            <input name="password" type="password" placeholder="Password*" class="username" id="pass"/>
+
+            <button class="btn" onclick="login()">Get Started</button>
+
+            <br><br><br><br>
+            <a href=""><p class="signup2">Forget Password?</p></a>
+        </div>
+        </div>
+        `
+        document.getElementById('form_login').innerHTML = str;
+    }
+
+    const API_URl = 'http://localhost:8080/users'
+
+
+    function save() {
+        let data = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+            name: document.getElementById('name').value
+        }
+        axios.post(API_URl + "/register", data).then(res => {
+            alert("Đăng Kí Thành Công!")
+        })
+        formsignin();
+    }
+
+    function login() {
+        let data = {
+            username: document.getElementById('usn').value,
+            password: document.getElementById('pass').value
+        }
+        axios.post(API_URl + "/login", data).then(res => {
+            alert("Đăng Nhập Thành Công!")
+            localStorage.setItem('username', document.getElementById('usn').value)
+            document.getElementById('form_login').innerHTML = '';
+            loadBlog();
+            loadRight()
+        })
+    }
+
+    function loadBlog() {
+        axios.get('http://localhost:8080/blogs').then((res) =>{
+            let list = res.data;
+            let str = '<div class="list">'
+            for (const blog of list)    {
+                str += `<div class="list-item">
+                        <h2>${blog.title}</h2>
+                        <p>${blog.content}</p>
+                    `
+            }
+            str += '</div>'
+            document.getElementById('body').innerHTML = str;
+        })
+    }
+</script>
+</body>
+</html>

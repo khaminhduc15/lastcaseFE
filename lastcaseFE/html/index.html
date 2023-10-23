@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+<div class="navbar">
+    <div class="nav_left">
+        <div><a href="">Home</a></div>
+        <div><a href="">Blog</a></div>
+        <div><a href="">Profile</a></div>
+    </div>
+    <div class="nav_right" id="nav_right">
+
+    </div>
+</div>
+<hr>
+<script>
+    function loadRight(){
+        let usn = localStorage.getItem('usn');
+        if(usn != null){
+            let str = `<div class="usn_text">Hi, '+ usn +'</div>`
+            document.getElementById('nav_right').innerHTML = str;
+        }
+        else {
+            let str = `<button class="btn_login">Sign In/Sign Up</button>`
+            document.getElementById('nav_right').innerHTML = str;
+        }
+    }
+    loadRight()
+</script>
+</body>
+</html>
