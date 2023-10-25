@@ -182,10 +182,12 @@ a{
 }
 .list{
     display: flex;
+    width: 100%;
 }
 .list-item{
     width: 25%;
     height: 100px;
     border: 1px solid;
     text-align: center;
+    margin: 5px;
 }
