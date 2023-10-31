@@ -7,13 +7,14 @@
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+
 </head>
 <body>
 <div class="navbar">
     <div class="nav_left">
-        <div><a onclick="loadBlog()">Home</a></div>
-        <div><a href="">My Blog</a></div>
-        <div><a href="">Profile</a></div>
+        <span onclick="loadBlog()">Home</span>
+        <span onclick="loadMyBlog()">My Blog</span>
+        <span onclick="myProfile()">Profile</span>
     </div>
     <div class="nav_right" id="nav_right">
 
@@ -75,6 +76,7 @@
     }
 
     function formsignin() {
+        document.getElementById('body').innerHTML = '';
         let str = `
                <div class="c1">
 
@@ -129,6 +131,8 @@
         axios.post(API_URl + "/login", data).then(res => {
             alert("Đăng Nhập Thành Công!")
             localStorage.setItem('username', document.getElementById('usn').value)
+            let user = res.data;
+            localStorage.setItem('id', user.id);
             document.getElementById('form_login').innerHTML = '';
             loadBlog();
             loadRight()
@@ -141,6 +145,7 @@
             let str = '<div class="list">'
             for (const blog of list)    {
                 str += `<div class="list-item">
+                        <img src="${blog.image}">
                         <h2>${blog.title}</h2>
                         <p>${blog.content}</p>
                         </div>
@@ -151,7 +156,100 @@
         })
     }
     function loadMyBlog() {
-        
+        let id = localStorage.getItem('id');
+        axios.get('http://localhost:8080/blogs/users/' + id).then(res =>{
+            let list = res.data;
+            console.log(list)
+            let str = '<center><button class="btn-primary" onclick="showFormAddBlog()">Add New Blog</button></center>' +
+                '<div class="list">'
+            for (let i = 0; i < list.length; i++) {
+                str += `<div class="list-item">
+                        <img src="${list[i].image}">
+                        <h2>${list[i].title}</h2>
+                        <p>${list[i].content}</p>
+                        <button class="btn-primary" onclick="showFormEditBlog(`+ list[i].id +`)">Edit</button>
+                        <button class="btn-primary" onclick="deleteBlog(`+ list[i].id +`)">Delete</button>
+                        </div>
+                    `
+            }
+            str += '</div>'
+            document.getElementById('body').innerHTML = str;
+        })
+    }
+    function showFormAddBlog() {
+        let str = `
+        <div class="formAdd">
+            <div class="title"><span>Title:</span> <input type="text" id="title" placeholder="Title"></div>
+            <div class="title"><span>Content:</span> <input type="text" id="content" placeholder="Content"></div>
+            <div class="title"><span>Image:</span> <input type="text" id="image" placeholder="Image"></div>
+            <button class="btn-primary" onclick="addBlog()">Save</button>
+        </div>
+        `
+        document.getElementById('body').innerHTML = str;
+    }
+    function addBlog(){
+        let data = {
+            title : document.getElementById('title').value,
+            content : document.getElementById('content').value,
+            image : document.getElementById('image').value,
+            user : {
+                id : localStorage.getItem('id')
+            }
+        }
+        axios.post('http://localhost:8080/blogs', data).then(res =>{
+            alert("Thêm Thành Công!");
+            loadMyBlog();
+        })
+    }
+    function myProfile() {
+        let id = localStorage.getItem('id');
+        axios.get('http://localhost:8080/users/' + id).then(res =>{
+            let user = res.data;
+            let str = `<div class="signup">
+            <h1 class="signup1">My Profile</h1>
+            <br><br><br><br>
+            <input name="name" type="text" placeholder="Name*" id="name" class="username" value="${user.name}">
+
+            <input name="username" type="text"  id="username"  class="username" value="${user.username}">
+
+            <input name="password" type="password" placeholder="Password*" id="password" class="username" value="${user.password}">
+
+            <button class="btn" onclick="saveProfile()">Save</button>
+        </div>
+            `
+            document.getElementById('body').innerHTML = str;
+        })
+    }
+    function saveProfile(){
+        let id = localStorage.getItem('id');
+        let data = {
+            username : document.getElementById('username').value,
+            name : document.getElementById('name').value,
+            password : document.getElementById('password').value
+        }
+        axios.put('http://localhost:8080/users/' + id, data).then(res =>{
+            alert("Sửa Thành Công!");
+            loadBlog();
+        })
+    }
+    function showFormEditBlog(id){
+        console.log(id);
+        axios.get('http://localhost:8080/blogs' + id).then(res =>{
+            let blog = res.data;
+            let str = `
+        <div class="formAdd">
+            <div class="title"><span>Title:</span> <input type="text" id="title" placeholder="Title" value="${blog.title}"></div>
+            <div class="title"><span>Content:</span> <input type="text" id="content" placeholder="Content" value="${blog.content}></div>
+            <div class="title"><span>Image:</span> <input type="text" id="image" placeholder="Image" value="${blog.image}></div>
+            <button class="btn-primary" onclick="editBlog()">Save</button>
+        </div>
+        `
+            document.getElementById('body').innerHTML = str;
+        })
+
+    }
+    function deleteBlog(){
+
     }
 </script>
 </body>
