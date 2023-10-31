@@ -186,8 +186,43 @@ a{
 }
 .list-item{
     width: 25%;
-    height: 100px;
+    height: 350px;
     border: 1px solid;
     text-align: center;
     margin: 5px;
+}
+.list-item > img{
+    width: 90%;
+    height: auto;
+    margin: 5px;
+}
+.btn-primary{
+    background: #695fff;
+    color: white;
+    font-size: 14px;
+    padding: 5px;
+    border-radius: 5px;
+}
+.formAdd{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.title{
+    height: 30px;
+    margin: 20px;
+    width: 500px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+.title > input{
+    height: 100%;
+    width: 300px;
+}
+.title > span{
+    line-height: 30px;
+}
+.formAdd > button{
+    width: 100px;
 }
