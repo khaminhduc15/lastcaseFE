@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="../css/login.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <link rel="stylesheet" href="../css/login.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
 
@@ -12,31 +15,41 @@
 <body>
 <div class="navbar">
     <div class="nav_left">
-        <span onclick="loadBlog()">Home</span>
-        <span onclick="loadMyBlog()">My Blog</span>
-        <span onclick="myProfile()">Profile</span>
+        <div class="nav_btn" onclick="loadBlog()"><span>Home</span></div>
+        <div class="nav_btn" onclick="loadMyBlog()"><span>My Blog</span></div>
+        <div class="nav_btn" onclick="myProfile()"><span>Profile</span></div>
     </div>
     <div class="nav_right" id="nav_right">
 
     </div>
 </div>
 <hr>
-<div class="container" id="form_login">
+<div class="container-fluid" id="body">
+    <div class="row">
+        <div class="col-2">
+                <div class="row">
+                    <div class="col-12">
+                        <input class="search form-control" type="search" placeholder="Search" aria-label="Search">
+                    </div>
+                    <center class="col-12">
+                        <button class="btn-outline-success mt-2" style="border-radius: 5px; width: 100%">Search</button>
+                    </center>
+                </div>
+        </div>
+        <div class="col-8" id="main"></div>
+        <div class="col-2"></div>
+    </div>
 </div>
-<div class="body" id="body"></div>
+<div id="modal-delete"></div>
 <script>
-    $(document).ready(function () {
-        $(".container").fadeIn(1000);
-        $(".s2class").css({"color": "#EE9BA3"});
-        $(".s1class").css({"color": "#748194"});
-        $(".signin").css({"display": "none"});
-        $(".signup").css({"display": ""});
-    });
 
     function loadRight(){
         let usn = localStorage.getItem('username');
         if(usn != null){
-            let str = `<div class="usn_text">Hi, `+usn+`</div>`
+            let str = `<div class="nav_right">
+                        <div class="usn_text">Hi, `+usn+`</div>
+                        <div class="btn-primary" onclick="logout()">Logout</div>
+                        </div>`
             document.getElementById('nav_right').innerHTML = str;
             loadBlog();
         }
@@ -45,9 +58,17 @@
             document.getElementById('nav_right').innerHTML = str;
         }
     }
+    function logout(){
+        localStorage.removeItem('username');
+        localStorage.removeItem('id')
+        loadRight();
+        loadBlog();
+    }
     loadRight()
     function formsignup() {
-        let str = `<div class="c1">
+        let str = `
+        <div class="container" id="form_login">
+        <div class="c1">
 
         <div class="c11">
             <h1 class="mainhead">PICK YOUR SPOT</h1>
@@ -71,14 +92,21 @@
             <button class="btn" onclick="save()">Sign Up</button>
         </div>
         </div>
+        </div>
         `
-        document.getElementById('form_login').innerHTML = str;
+        document.getElementById('body').innerHTML = str;
+        $(".container").fadeIn(1000);
+        $(".s2class").css({"color": "#EE9BA3"});
+        $(".s1class").css({"color": "#748194"});
+        $(".signin").css({"display": ""});
+        $(".signup").css({"display": ""});
     }
 
     function formsignin() {
         document.getElementById('body').innerHTML = '';
         let str = `
-               <div class="c1">
+        <div class="container" id="form_login">
+        <div class="c1">
 
         <div class="c11">
             <h1 class="mainhead">PICK YOUR SPOT</h1>
@@ -104,8 +132,14 @@
             <a href=""><p class="signup2">Forget Password?</p></a>
         </div>
         </div>
+        </div>
         `
-        document.getElementById('form_login').innerHTML = str;
+        document.getElementById('body').innerHTML = str;
+        $(".container").fadeIn(1000);
+        $(".s2class").css({"color": "#EE9BA3"});
+        $(".s1class").css({"color": "#748194"});
+        $(".signin").css({"display": ""});
+        $(".signup").css({"display": ""});
     }
 
     const API_URl = 'http://localhost:8080/users'
@@ -129,22 +163,30 @@
             password: document.getElementById('pass').value
         }
         axios.post(API_URl + "/login", data).then(res => {
-            alert("Đăng Nhập Thành Công!")
-            localStorage.setItem('username', document.getElementById('usn').value)
-            let user = res.data;
-            localStorage.setItem('id', user.id);
-            document.getElementById('form_login').innerHTML = '';
-            loadBlog();
-            loadRight()
+            // console.log(res);
+            let data = res.data;
+            if (data !== ""){
+                localStorage.setItem('username', document.getElementById('usn').value)
+                alert("Đăng Nhập Thành Công!")
+                let user = res.data;
+                localStorage.setItem('id', user.id);
+                document.getElementById('form_login').innerHTML = '';
+                loadBlog();
+                loadRight()
+            }
+            else {
+                alert("Sai tài khoản hoặc mật khẩu!")
+                loadRight();
+            }
         })
     }
 
     function loadBlog() {
         axios.get('http://localhost:8080/blogs').then((res) =>{
             let list = res.data;
-            let str = '<div class="list">'
+            let str = '<div class="row">'
             for (const blog of list)    {
-                str += `<div class="list-item">
+                str += `<div class="col-lg-3 col-md-4 col-sm-6 col-12 list-item" onclick="showBlog(`+blog.id+`)">
                         <img src="${blog.image}">
                         <h2>${blog.title}</h2>
                         <p>${blog.content}</p>
@@ -152,28 +194,39 @@
                     `
             }
             str += '</div>'
-            document.getElementById('body').innerHTML = str;
+            document.getElementById('main').innerHTML = str;
+        })
+    }
+    function showBlog(id) {
+        axios.get('http://localhost:8080/blogs/' + id).then(res =>{
+            let blog = res.data;
+            let str = `<div class="col-12 list-item">
+                        <img src="${blog.image}">
+                        <h2>${blog.title}</h2>
+                        <p>${blog.content}</p>
+                        </div>`
+            document.getElementById('main').innerHTML = str;
         })
     }
     function loadMyBlog() {
         let id = localStorage.getItem('id');
         axios.get('http://localhost:8080/blogs/users/' + id).then(res =>{
             let list = res.data;
-            console.log(list)
+            // console.log(list)
             let str = '<center><button class="btn-primary" onclick="showFormAddBlog()">Add New Blog</button></center>' +
-                '<div class="list">'
+                '<div class="row">'
             for (let i = 0; i < list.length; i++) {
-                str += `<div class="list-item">
+                str += `<div class="col-lg-3 col-md-4 col-sm-6 col-12 list-item" onclick="showBlog(`+list[i].id+`)">
                         <img src="${list[i].image}">
                         <h2>${list[i].title}</h2>
                         <p>${list[i].content}</p>
                         <button class="btn-primary" onclick="showFormEditBlog(`+ list[i].id +`)">Edit</button>
-                        <button class="btn-primary" onclick="deleteBlog(`+ list[i].id +`)">Delete</button>
+                        <button class="btn-primary" onclick="showFormDelete(`+list[i].id+`)">Delete</button>
                         </div>
                     `
             }
             str += '</div>'
-            document.getElementById('body').innerHTML = str;
+            document.getElementById('main').innerHTML = str;
         })
     }
     function showFormAddBlog() {
@@ -190,11 +243,11 @@
     function addBlog(){
         let data = {
             title : document.getElementById('title').value,
-            content : document.getElementById('content').value,
-            image : document.getElementById('image').value,
             user : {
                 id : localStorage.getItem('id')
-            }
+            },
+            content : document.getElementById('content').value,
+            image : document.getElementById('image').value
         }
         axios.post('http://localhost:8080/blogs', data).then(res =>{
             alert("Thêm Thành Công!");
@@ -205,16 +258,12 @@
         let id = localStorage.getItem('id');
         axios.get('http://localhost:8080/users/' + id).then(res =>{
             let user = res.data;
-            let str = `<div class="signup">
-            <h1 class="signup1">My Profile</h1>
-            <br><br><br><br>
-            <input name="name" type="text" placeholder="Name*" id="name" class="username" value="${user.name}">
-
-            <input name="username" type="text"  id="username"  class="username" value="${user.username}">
-
-            <input name="password" type="password" placeholder="Password*" id="password" class="username" value="${user.password}">
-
-            <button class="btn" onclick="saveProfile()">Save</button>
+            let str = `<center><h3>My Profile</h3></center>
+        <div class="formAdd">
+            <div class="title"><span>Name:</span> <input type="text" id="name" placeholder="Name" value="${user.name}"></div>
+            <div class="title"><span>UserName:</span> <input type="text" id="content" placeholder="Content" value="${user.username}"></div>
+            <div class="title"><span>Password:</span> <input type="password" id="image" placeholder="Image" value="${user.password}"></div>
+            <button class="btn-primary" onclick="saveProfile()">Save</button>
         </div>
             `
             document.getElementById('body').innerHTML = str;
@@ -233,23 +282,87 @@
         })
     }
     function showFormEditBlog(id){
-        console.log(id);
-        axios.get('http://localhost:8080/blogs' + id).then(res =>{
+        axios.get('http://localhost:8080/blogs/' + id).then(res =>{
             let blog = res.data;
             let str = `
+        <center><h3>Edit Blog</h3></center>
         <div class="formAdd">
             <div class="title"><span>Title:</span> <input type="text" id="title" placeholder="Title" value="${blog.title}"></div>
-            <div class="title"><span>Content:</span> <input type="text" id="content" placeholder="Content" value="${blog.content}></div>
-            <div class="title"><span>Image:</span> <input type="text" id="image" placeholder="Image" value="${blog.image}></div>
-            <button class="btn-primary" onclick="editBlog()">Save</button>
+            <div class="title"><span>Content:</span> <input type="text" id="content" placeholder="Content" value="${blog.content}"></div>
+            <div class="title"><span>Image:</span> <input type="text" id="image" placeholder="Image" value="${blog.image}"></div>
+            <button class="btn-primary" onclick="editBlog(`+id+`)">Save</button>
         </div>
         `
             document.getElementById('body').innerHTML = str;
         })
-
     }
-    function deleteBlog(){
+    function editBlog(id){
+        // console.log(id);
+        let data = {
+            title: document.getElementById('title').value,
+            user: {
+                id: localStorage.getItem('id')
+            },
+            content: document.getElementById('content').value,
+            image: document.getElementById('image').value
+        }
+        axios.put('http://localhost:8080/blogs/' + id, data).then(res =>{
+            alert("Sửa Thành Công!");
+            loadMyBlog();
+        })
+    }
+    function showFormDelete(id) {
+        let str = `<!-- The Modal -->
+<div id="myModal" class="modal">
 
+    <!-- Modal content -->
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close">&times;</span>
+            <h2>Delete Blog?</h2>
+        </div>
+        <div class="modal-body">
+            <center>
+            <button class="btn-primary" onclick="deleteBlog(`+id+`)">Delete</button>
+            <button class="btn-primary" onclick="back()">Back</button>
+            </center>
+        </div>
+    </div>
+
+</div>`
+        document.getElementById('modal-delete').innerHTML = str;
+        // Get the modal
+        let modal = document.getElementById("myModal");
+        modal.style.display = "block";
+        document.getElementById('body').style.opacity = "0.3";
+
+// Get the <span> element that closes the modal
+        let span = document.getElementsByClassName("close")[0];
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+            document.getElementById('body').style.opacity = "1";
+        }
+
+// When the user clicks anywhere outside of the modal, close it
+        document.getElementById('body').onclick = function (event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+                document.getElementById('body').style.opacity = "1";
+            }
+        }
+    }
+    function deleteBlog(id){
+        axios.delete('http://localhost:8080/blogs/' + id).then(res =>{
+            alert("Xóa Thành Công!");
+            document.getElementById('myModal').style.display = "none";
+            document.getElementById('body').style.opacity = "1";
+            loadMyBlog();
+        })
+    }
+    function back() {
+        document.getElementById('myModal').style.display = "none";
+        document.getElementById('body').style.opacity = "1";
     }
 </script>
 </body>

@@ -26,11 +26,31 @@ body {
     justify-content: space-around;
     align-items: center;
 }
+.nav_btn{
+    text-align: center;
+    width: 15%;
+    height: 80%;
+}
+.nav_btn > span{
+    line-height: 40px;
+}
+.nav_btn:hover{
+    background: white;
+    color: #453dff;
+}
+.nav_right{
+    display: flex;
+    justify-content: space-around;
+    flex-basis: 40%;
+    align-items: center;
+}
 .usn_text{
+    margin-right: 10px;
     font-size: 16px;
     padding: 5px;
     border: 1px solid;
     border-radius: 15px;
+    width: auto;;
 }
 .btn_login{
     padding: 10px;
@@ -180,16 +200,13 @@ a{
 .signin{
     display:initial;
 }
-.list{
-    display: flex;
-    width: 100%;
-}
+/*.raw{*/
+/*    display: flex;*/
+/*    width: 100%;*/
+/*}*/
 .list-item{
-    width: 25%;
-    height: 350px;
-    border: 1px solid;
     text-align: center;
-    margin: 5px;
+    margin-top: 20px;
 }
 .list-item > img{
     width: 90%;
@@ -197,8 +214,6 @@ a{
     margin: 5px;
 }
 .btn-primary{
-    background: #695fff;
-    color: white;
     font-size: 14px;
     padding: 5px;
     border-radius: 5px;
@@ -225,4 +240,71 @@ a{
 }
 .formAdd > button{
     width: 100px;
+}
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 30%;
+    top: 10%;
+    width: 30%; /* Full width */
+    height: 30%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+}
+
+/* Modal Content */
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-header {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
+}
+
+.modal-body {padding: 2px 16px;}
+
+.modal-footer {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
 }
