@@ -13,7 +13,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.2.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.2.8/firebase-analytics.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.2.8/firebase-storage.js"></script>
-    <script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
 
 </head>
 <body>
@@ -52,7 +51,20 @@
     // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
 </script>
+<script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
 <script>
+    // function showEditor(){
+    //     let editor;
+    //
+    //     ClassicEditor
+    //         .create( document.querySelector( '#editor' ) )
+    //         .then( newEditor => {
+    //             editor = newEditor;
+    //         } )
+    //         .catch( error => {
+    //             console.error( error );
+    //         } );
+    // }
     function loadRight(){
         let usn = localStorage.getItem('username');
         if(usn != null){
@@ -210,7 +222,7 @@
             let str = '<div class="row">'
             for (const blog of list)    {
                 str += `<div class="col-lg-3 col-md-4 col-sm-6 col-12 list-item" onclick="showBlog(`+blog.id+`)">
-                        <img src="${blog.image}">
+                        <img src="${blog.image}" alt="">
                         <h2>${blog.title}</h2>
                         <p>${blog.content}</p>
                         </div>
@@ -248,8 +260,8 @@
                 for (let i = 0; i < list.length; i++) {
                     str += `<div class="col-lg-3 col-md-4 col-sm-6 col-12 list-item">
                         <img src="${list[i].image}" onclick="(\`+list[i].id+\`)">
-                        <h2 onclick="showBlog(\`+list[i].id+\`)">${list[i].title}</h2>
-                        <p onclick="showBlog(\`+list[i].id+\`)">${list[i].content}</p>
+                        <h2 onclick="showBlog(`+list[i].id+`)">${list[i].title}</h2>
+                        <p onclick="showBlog(`+list[i].id+`)">${list[i].content}</p>
                         <button class="btn-primary" onclick="showFormEditBlog(`+ list[i].id +`)">Edit</button>
                         <button class="btn-primary" onclick="showFormDelete(`+list[i].id+`)">Delete</button>
                         </div>
@@ -264,12 +276,21 @@
         let str = `
         <div class="formAdd">
             <div class="title"><span>Title:</span> <input type="text" id="title" placeholder="Title"></div>
-            <div class="title"><span>Content:</span> <input type="text" id="content" placeholder="Content"></div>
             <div class="title"><span>Image:</span> <input type="file" id="image" placeholder="Image" onchange="uploadImg()"></div>
-            <button class="btn-primary" onclick="addBlog()">Save</button>
         </div>
+        <span>Content</span> <div class="content" id="editor"></div>
+        <button class="btn-primary mt-2" onclick="addBlog()">Save</button>
         `
         document.getElementById('main').innerHTML = str;
+        let editor;
+        ClassicEditor
+            .create( document.querySelector( '#editor' ) )
+            .then( newEditor => {
+                editor = newEditor;
+            } )
+            .catch( error => {
+                console.error( error );
+            } );
     }
     function uploadImg(){
         const ref = firebase.storage().ref();
@@ -284,20 +305,32 @@
         })
             .catch(console.error)
     }
+
     function addBlog(){
-        let ref = firebase.storage().ref();
         let data = {
             title : document.getElementById('title').value,
             user : {
                 id : localStorage.getItem('id')
             },
-            content : document.getElementById('content').value,
+            content : "",
             image : localStorage.getItem('img')
         }
-        axios.post('http://localhost:8080/blogs', data).then(res =>{
-            alert("Thêm Thành Công!");
-            loadMyBlog();
-        })
+        ClassicEditor
+            .create( document.querySelector( '#editor' ) )
+            .then( newEditor => {
+                data.content = newEditor.getData();
+                axios.post('http://localhost:8080/blogs', data)
+                    .then(res => {
+                        alert("Thêm Thành Công!");
+                        loadMyBlog();
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            })
+            .catch( error => {
+                console.error( error );
+            });
         localStorage.removeItem('img');
     }
     function myProfile() {
@@ -305,13 +338,13 @@
         let id = localStorage.getItem('id');
         axios.get('http://localhost:8080/users/' + id).then(res =>{
             let user = res.data;
-            let str = '<center><h3>My Profile</h3></center>\n' +
-                '        <div class="formAdd">\n' +
-                '            <div class="title"><span>Name:</span> <input type="text" id="name" placeholder="Name" value="${user.name}"></div>\n' +
-                '            <div class="title"><span>UserName:</span> <input type="text" id="content" placeholder="Content" value="${user.username}"></div>\n' +
-                '            <div class="title"><span>Password:</span> <input type="password" id="image" placeholder="Image" value="${user.password}"></div>\n' +
-                '            <button class="btn-primary" onclick="saveProfile()">Save</button>\n' +
-                '        </div>'
+            let str = `<center><h3>My Profile</h3></center>
+        <div class="formAdd">
+            <div class="title"><span>Name:</span><input type="text" id="name" placeholder="Name" value="${user.name}"></div>
+            <div class="title"><span>UserName:</span> <input type="text" id="username" placeholder="Content" value="${user.username}"></div>
+            <div class="title"><span>Password:</span> <input type="password" id="password" placeholder="Image" value="${user.password}"></div>
+            <button class="btn-primary" onclick="saveProfile()">Save</button>
+        </div>`
             document.getElementById('main').innerHTML = str;
         })
     }
@@ -331,17 +364,28 @@
         axios.get('http://localhost:8080/blogs/' + id).then(res =>{
             let blog = res.data;
             localStorage.setItem('img2', blog.image);
-            console.log(localStorage.getItem('img2'));
+            // console.log(localStorage.getItem('img2'));
             let str = `
         <center><h3>Edit Blog</h3></center>
         <div class="formAdd">
             <div class="title"><span>Title:</span> <input type="text" id="title" placeholder="Title" value="${blog.title}"></div>
-            <div class="title"><span>Content:</span> <input type="text" id="content" placeholder="Content" value="${blog.content}"></div>
             <div class="title"><span>Image:</span> <input type="file" id="image" onchange="uploadImg()"></div>
             <button class="btn-primary" onclick="editBlog(`+id+`)">Save</button>
         </div>
+        <span>Content</span> <div class="content" id="editor"></div>
+        <button class="btn-primary mt-2" onclick="editBlog(\`+id+\`)">Save</button>
         `
             document.getElementById('main').innerHTML = str;
+            let editor;
+            ClassicEditor
+                .create( document.querySelector( '#editor' ) )
+                .then( newEditor => {
+                    editor = newEditor;
+                } )
+                .catch( error => {
+                    console.error( error );
+                } );
+            editor.setData(blog.content);
         })
     }
     function editBlog(id){
