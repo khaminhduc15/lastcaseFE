@@ -61,7 +61,7 @@ body {
 }
 .container{
     display:none;
-    position:absolute;
+    position:relative;
     width: auto;
     height:auto;
     top: calc(50% - 200px);
@@ -119,7 +119,7 @@ body {
     position:absolute;
     bottom:0;
     left:63%;
-    margin-left: -50%;
+    margin-left: -60%;
 }
 .s1class span,  .s2class span{
     display:block;
@@ -132,7 +132,7 @@ body {
     position:absolute;
     bottom:0;
     right:63%;
-    margin-right: -50%;
+    margin-right: 10%;
 }
 .mainhead{
     color:white;

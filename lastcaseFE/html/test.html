@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+<body>
+<div id="editor"></div>
+<button onclick="tessst()">Ấn</button>
+<script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
+<script>
+    let editor;
+
+    ClassicEditor
+        .create( document.querySelector( '#editor' ) )
+        .then( newEditor => {
+            editor = newEditor;
+        } )
+        .catch( error => {
+            console.error( error );
+        } );
+    function tessst() {
+        const data = editor.getData();
+        console.log(data)
+    }
+</script>
+
+
+</body>
+</html>
